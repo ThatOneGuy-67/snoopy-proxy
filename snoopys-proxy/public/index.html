@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Snoopy's Web</title>
+<style>
+  :root{
+    --bg:hsl(220 15% 8%); --fg:hsl(220 10% 95%); --muted:hsl(220 10% 60%);
+    --primary:hsl(200 80% 60%); --glass:hsla(220,15%,15%,0.6); --border:hsla(220,15%,25%,0.5);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:ui-sans-serif,system-ui,sans-serif;color:var(--fg);min-height:100vh;
+    background:radial-gradient(ellipse at top,hsl(220 15% 12%) 0%,transparent 50%),
+      radial-gradient(ellipse at bottom,hsl(220 15% 6%) 0%,transparent 50%),var(--bg);
+    overflow-x:hidden;}
+  .stars{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;
+    animation:tw var(--d) ease-in-out infinite;animation-delay:var(--dl);opacity:0}
+  @keyframes tw{0%,100%{opacity:0;transform:scale(.5)}50%{opacity:var(--o);transform:scale(1)}}
+  .container{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:24px}
+  .glass{background:linear-gradient(135deg,var(--glass),hsla(220,15%,15%,0.3));
+    backdrop-filter:blur(20px);border:1px solid var(--border);border-radius:14px;
+    box-shadow:0 8px 32px hsla(220,15%,5%,0.4);}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;padding:8px;flex:1}
+  .tab,.icon-btn{background:transparent;border:none;color:var(--muted);padding:8px 14px;
+    border-radius:10px;cursor:pointer;font-size:14px;display:inline-flex;align-items:center;gap:6px}
+  .tab.active{background:hsla(200,80%,60%,0.2);color:var(--primary)}
+  .tab:hover{background:hsla(220,15%,30%,0.4);color:var(--fg)}
+  .tab .x{margin-left:6px;opacity:.6}
+  .tab .x:hover{color:#f55;opacity:1}
+  .icon-btn{padding:10px;background:var(--glass);border:1px solid var(--border)}
+  .hero{text-align:center;padding:60px 16px 30px}
+  .hero h1{font-size:clamp(32px,6vw,56px);font-weight:800;letter-spacing:-.02em;
+    text-shadow:0 0 20px hsla(200,80%,60%,0.5);margin-bottom:8px}
+  .hero p{color:var(--muted);font-family:ui-monospace,monospace;margin-bottom:32px}
+  .search{display:flex;align-items:center;gap:8px;padding:8px;max-width:640px;margin:0 auto}
+  .search input{flex:1;background:transparent;border:none;outline:none;color:var(--fg);font-size:16px;padding:10px 12px}
+  .search button{background:hsla(200,80%,60%,0.2);color:var(--primary);border:none;
+    padding:10px 14px;border-radius:8px;cursor:pointer;font-size:18px}
+  .search button:hover{background:hsla(200,80%,60%,0.35)}
+  section.hub{margin:24px 0}
+  .section-title{margin-bottom:14px;padding:0 4px}
+  .section-title h2{font-size:22px;font-weight:700}
+  .section-title small{color:var(--muted)}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px}
+  .card{padding:20px;text-align:center;cursor:pointer;transition:transform .25s,border-color .25s,box-shadow .25s}
+  .card:hover{transform:translateY(-4px) scale(1.03);border-color:hsla(200,80%,60%,0.5);
+    box-shadow:0 12px 40px hsla(220,15%,5%,0.5),0 0 30px hsla(200,80%,60%,0.15)}
+  .card .emoji{font-size:36px;margin-bottom:8px;display:block}
+  .card .name{font-size:14px;font-weight:600}
+  footer{text-align:center;padding:30px;color:var(--muted);font-family:ui-monospace,monospace;font-size:13px}
+  .frame-wrap{padding:16px}
+  .frame-wrap iframe{width:100%;height:80vh;border:none;border-radius:10px;background:#fff}
+  .status{font-size:12px;color:var(--muted);text-align:center;padding:6px}
+</style>
+</head>
+<body>
+<div class="stars" id="stars"></div>
+
+<div class="container">
+  <div class="topbar">
+    <div class="glass tabs" id="tabs">
+      <button class="tab active" data-tabid="home">🏠 Home</button>
+    </div>
+    <button class="icon-btn" id="cloakBtn" title="Cloak">🛡️</button>
+  </div>
+
+  <div id="home-view">
+    <div class="hero">
+      <h1>Snoopy's Web</h1>
+      <p>// Powered by Scramjet • Real proxy • Unblocked</p>
+      <div class="glass search">
+        <span style="margin-left:10px">🔍</span>
+        <input id="searchInput" placeholder="Enter URL or search..." />
+        <button id="searchBtn">→</button>
+      </div>
+      <div class="status" id="status">Initializing proxy…</div>
+    </div>
+
+    <section class="hub">
+      <div class="section-title"><h2>Apps Hub</h2><small>Quick access</small></div>
+      <div class="grid" id="appsGrid"></div>
+    </section>
+
+    <section class="hub">
+      <div class="section-title"><h2>Games Hub</h2><small>Play unblocked</small></div>
+      <div class="grid" id="gamesGrid"></div>
+    </section>
+
+    <footer>// For educational purposes only</footer>
+  </div>
+
+  <div id="frame-view" style="display:none" class="glass frame-wrap">
+    <iframe id="proxyFrame"></iframe>
+  </div>
+</div>
+
+<!-- Scramjet bootstrap -->
+<script src="/baremux/index.js"></script>
+<script src="/scram/scramjet.controller.js"></script>
+<script>
+  const { ScramjetController } = $scramjetLoadController();
+  const scramjet = new ScramjetController({
+    files: {
+      wasm: "/scram/scramjet.wasm.js",
+      worker: "/scram/scramjet.worker.js",
+      client: "/scram/scramjet.client.js",
+      shared: "/scram/scramjet.shared.js",
+      sync: "/scram/scramjet.sync.js"
+    }
+  });
+  scramjet.init("/sw.js").then(async () => {
+    const { BareMuxConnection } = await import("/baremux/index.mjs");
+    const connection = new BareMuxConnection("/baremux/worker.js");
+    await connection.setTransport("/epoxy/index.mjs", [{ wisp: (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/bare/" }]);
+    document.getElementById("status").textContent = "✓ Proxy ready";
+  }).catch(err => {
+    document.getElementById("status").textContent = "Proxy init failed: " + err.message;
+    console.error(err);
+  });
+
+  function encodeUrl(url) {
+    return scramjet.encodeUrl(url);
+  }
+  window.__encodeUrl = encodeUrl;
+</script>
+
+<script>
+  // Stars
+  const starsEl = document.getElementById('stars');
+  for(let i=0;i<80;i++){
+    const s=document.createElement('div');s.className='star';
+    s.style.left=Math.random()*100+'%';s.style.top=Math.random()*100+'%';
+    s.style.setProperty('--d',(2+Math.random()*4)+'s');
+    s.style.setProperty('--dl',(Math.random()*4)+'s');
+    s.style.setProperty('--o',(0.3+Math.random()*0.7));
+    starsEl.appendChild(s);
+  }
+
+  const apps = [
+    {n:'TikTok',e:'🎵',u:'https://www.tiktok.com'},
+    {n:'Snapchat',e:'👻',u:'https://www.snapchat.com'},
+    {n:'Instagram',e:'📷',u:'https://www.instagram.com'},
+    {n:'Discord',e:'💬',u:'https://discord.com/app'},
+    {n:'YouTube',e:'▶️',u:'https://www.youtube.com'},
+    {n:'Reddit',e:'🔶',u:'https://www.reddit.com'},
+  ];
+  const games = [
+    {n:'Roblox',e:'🎮',u:'https://www.roblox.com'},
+    {n:'Minecraft',e:'⛏️',u:'https://classic.minecraft.net'},
+    {n:'Slope',e:'🔴',u:'https://slope-game.github.io'},
+    {n:'1v1.LOL',e:'🔫',u:'https://1v1.lol'},
+    {n:'Retro Bowl',e:'🏈',u:'https://retrobowl.app'},
+    {n:'Subway Surfers',e:'🏃',u:'https://subwaysurf.io'},
+  ];
+
+  function renderGrid(id,items){
+    const g=document.getElementById(id);
+    items.forEach(it=>{
+      const c=document.createElement('div');c.className='glass card';
+      c.innerHTML=`<span class="emoji">${it.e}</span><div class="name">${it.n}</div>`;
+      c.onclick=()=>openInTab(it.u, it.n);
+      g.appendChild(c);
+    });
+  }
+  renderGrid('appsGrid',apps);
+  renderGrid('gamesGrid',games);
+
+  const tabsEl=document.getElementById('tabs');
+  const homeView=document.getElementById('home-view');
+  const frameView=document.getElementById('frame-view');
+  const frame=document.getElementById('proxyFrame');
+  const tabs=[]; let activeId='home';
+
+  function render(){
+    tabsEl.innerHTML='';
+    const home=document.createElement('button');
+    home.className='tab'+(activeId==='home'?' active':'');
+    home.innerHTML='🏠 Home';
+    home.onclick=()=>{activeId='home';update();};
+    tabsEl.appendChild(home);
+    tabs.forEach(t=>{
+      const b=document.createElement('button');
+      b.className='tab'+(activeId===t.id?' active':'');
+      b.innerHTML=`${t.title}<span class="x">✕</span>`;
+      b.onclick=(e)=>{
+        if(e.target.classList.contains('x')){
+          const i=tabs.findIndex(x=>x.id===t.id);
+          tabs.splice(i,1);
+          if(activeId===t.id) activeId=tabs.length?tabs[Math.max(0,i-1)].id:'home';
+        } else { activeId=t.id; }
+        render();update();
+      };
+      tabsEl.appendChild(b);
+    });
+  }
+  function update(){
+    const t=tabs.find(x=>x.id===activeId);
+    if(t){homeView.style.display='none';frameView.style.display='block';frame.src=window.__encodeUrl(t.url);}
+    else {homeView.style.display='block';frameView.style.display='none';frame.src='about:blank';}
+    render();
+  }
+  function openInTab(url, title){
+    const id='t'+Date.now();
+    tabs.push({id,title,url});activeId=id;update();
+  }
+
+  document.getElementById('searchBtn').onclick=doSearch;
+  document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')doSearch();});
+  function doSearch(){
+    const inp=document.getElementById('searchInput');
+    const q=inp.value.trim(); if(!q) return;
+    const isUrl=q.includes('.')&&!q.includes(' ');
+    const url=isUrl?(q.startsWith('http')?q:'https://'+q):'https://duckduckgo.com/?q='+encodeURIComponent(q);
+    let title; try{title=isUrl?new URL(url).hostname:'Search: '+q;}catch(_){title=q;}
+    openInTab(url, title);
+    inp.value='';
+  }
+
+  document.getElementById('cloakBtn').onclick=()=>{
+    const t=prompt('Page title:', "Google Classroom");
+    if(t) document.title=t;
+  };
+
+  render();
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "snoopys-web-proxy",
+  "version": "1.0.0",
+  "description": "Snoopy's Web - Scramjet-powered web proxy",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "@mercuryworkshop/bare-as-module3": "^2.2.4",
+    "@mercuryworkshop/epoxy-transport": "^2.1.21",
+    "@mercuryworkshop/libcurl-transport": "^1.3.10",
+    "@mercuryworkshop/scramjet": "^1.0.7",
+    "@tomphttp/bare-server-node": "^2.0.3",
+    "express": "^4.19.2"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
